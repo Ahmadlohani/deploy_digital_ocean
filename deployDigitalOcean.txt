@@ -1,0 +1,90 @@
+// install node and npm in digital ocean
+cd ~
+curl -sL https://deb.nodesource.com/setup_16.x -o /tmp/nodesource_setup.sh
+nano /tmp/nodesource_setup.sh
+sudo bash /tmp/nodesource_setup.sh
+sudo apt install nodejs
+
+// be at root
+sudo apt-get install nginx
+ 
+// go to root directory
+cd
+cd /etc/nginx/sites-available
+ls
+sudo vim default
+ 
+// hit i to edit
+// replace location / codeblock with the following code:
+// your api will run on /api on port 3001
+// your react app will run on / port 3000
+ location /api {
+        proxy_pass http://localhost:3001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+location /{
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+ 
+ 
+// make sure no errors
+sudo nginx -t
+ 
+// restart Nginx after making those changes
+sudo systemctl restart nginx
+cd
+ 
+// run npm install inside client and server as it is not pushed to github
+cd
+cd client
+
+npm install
+
+cd server
+
+npm install
+
+// come to root
+sudo npm install pm2 -g
+
+ 
+// to make react app live
+cd client
+pm2 start npm -- start
+ 
+// to make server live
+cd server
+pm2 start index.js or server.js
+
+// sometime you might want to restart pm2
+pm2 restart all
+ 
+// If you want to make changes
+cd client
+pm2 kill
+
+// goto client or server folder
+
+git pull https://github.com/felixCivalero/kaijas-client.git
+git pull https://github.com/felixCivalero/kaijas-server.git
+
+// to make react app live
+cd client
+pm2 start npm -- start
+ 
+// to make server live
+cd server
+pm2 start index.js or server.js
+
+// If want changes on digital ocean console
+sudo vim <filename>
